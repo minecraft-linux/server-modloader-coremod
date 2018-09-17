@@ -20,7 +20,16 @@ THook(std::string, _ZN6Common22getServerVersionStringB5cxx11Ev) {
       else
         ret += ", mods: ";
       f = false;
-      ret += basename(ent->l_name);
+      const char* name = basename(ent->l_name);
+      size_t namelen = strlen(name);
+      if (namelen >= 3 && memcmp(&name[namelen - 3], ".so", 3) == 0) {
+        namelen -= 3;
+        if (namelen >= 3 && memcmp(name, "lib", 3) == 0) {
+          name = &name[3];
+          namelen -= 3;
+        }
+      }
+      ret.append(name, namelen);
     }
   });
   ret += ")";
