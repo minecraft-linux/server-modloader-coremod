@@ -1,0 +1,50 @@
+version: 2
+jobs:
+  build:
+    docker:
+    - image: buildpack-deps:trusty
+    steps:
+    - checkout
+    - run:
+        name: Install deps
+        command: apt-get update && apt-get install -y git cmake zip
+    - run:
+        name: Fetch the mod sdk
+        command: wget https://github.com/minecraft-linux/server-modloader/releases/download/v0.0.1-alpha1/mod_sdk.zip && unzip mod_sdk.zip -d mod_sdk
+    - run:
+        name: Build
+        command: mkdir build && cd build && CMAKE_PREFIX_PATH=../mod_sdk cmake .. && make
+    - persist_to_workspace:
+        root: build/
+        paths: "libCoreMod.so"
+    - store_artifacts:
+        path: build/libCoreMod.so
+        destination: /
+  publish-github-release:
+    docker:
+    - image: cibuilds/github:0.10
+    steps:
+    - attach_workspace:
+        at: ./artifacts
+    - run:
+        name: Publish GitHub release
+        command: |
+          ghr -t ${GITHUB_TOKEN} -u ${CIRCLE_PROJECT_USERNAME} -r ${CIRCLE_PROJECT_REPONAME} -c ${CIRCLE_SHA1} \
+          -delete ${CIRCLE_TAG} ./artifacts/
+
+workflows:
+  version: 2
+  main:
+    jobs:
+    - build:
+        filters:
+          tags:
+            only: /.*/
+    - publish-github-release:
+        requires:
+        - build
+        filters:
+          branches:
+            ignore: /.*/
+          tags:
+            only: /.*/
