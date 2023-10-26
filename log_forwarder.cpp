@@ -13,7 +13,7 @@ public:
   static const char* _areaFilterString(LogAreaID);
 };
 
-TStaticHook(void, _ZN10BedrockLog6log_vaENS_11LogCategoryESt6bitsetILm3EENS_7LogRuleE9LogAreaIDjPKciS6_P13__va_list_tag,
+TStaticHook(void, _ZN10BedrockLog6log_vaENS_11LogCategoryENSt3__16bitsetILm3EEENS_7LogRuleE9LogAreaIDjPKciS7_P13__va_list_tag,
             BedrockLog, unsigned int category, std::bitset<3> set, int rule, LogAreaID area, unsigned int level,
             char const* tag, int tid, char const* format, va_list args) {
   Log::LogLevel ourLevel = MODLOADER_LOG_ERROR;
