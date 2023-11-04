@@ -8,10 +8,15 @@ else()
 endif()
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 
-#BDS is built with libc++ instead of libstdc++ since 1.20.40
-set(CMAKE_CXX_COMPILER "clang++")
+#BDS is linked to libc++ since 1.20.40
+if(NOT "${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
+  message(NOTICE "Setting compiler to clang++")
+  set(CMAKE_CXX_COMPILER "clang++")
+endif()
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -stdlib=libc++")
 set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -stdlib=libc++")
+
+set(MOD_VERSION "v0.0.1-alpha2")
 
 find_package(ModLoader REQUIRED)
 
