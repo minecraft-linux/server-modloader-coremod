@@ -1,0 +1,33 @@
+name: Build
+on: [push]
+jobs:
+  build:
+    runs-on: ubuntu-20.04
+    steps:
+      - name: Check out repository code
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+      - name: Install deps
+        run: sudo apt-get install -y git cmake zip libc++1-12 libc++abi-12-dev libc++-12-dev libc++abi1-12
+      - name: Retrieve version
+        run: |
+          echo "TAG_NAME=$(cat CMakeLists.txt | grep -Po '(?<=MOD_VERSION \")[^\"]+')" >> $GITHUB_OUTPUT
+        id: version
+      - name: Fetch the mod sdk
+        run: wget https://github.com/minecraft-linux/server-modloader/releases/download/v0.0.1-alpha1/mod_sdk.zip && unzip mod_sdk.zip -d mod_sd
+      - name: Build
+        run: mkdir build && cd build && CMAKE_PREFIX_PATH=../mod_sdk cmake .. && make
+      - name: Artifact - libCoreMod.so
+        uses: actions/upload-artifact@v3
+        with:
+          name: libCoreMod.so
+          path: build/libCoreMod.so
+      - name: Update release
+        uses: softprops/action-gh-release@v1
+        if: startsWith(github.event.head_commit.message, '[Release]')
+        with:
+          draft: true
+          tag_name: ${{ steps.version.outputs.TAG_NAME }}
+          files: |
+            build/libCoreMod.so
