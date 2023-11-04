@@ -7,7 +7,7 @@
 
 using namespace modloader;
 
-THook(std::string, _ZN6Common22getServerVersionStringB5cxx11Ev) {
+THook(std::string, _ZN6Common22getServerVersionStringEv) {
   std::string ret = original();
   ret += " modded (ModLoader ";
   ret += ModLoader::getVersion();
