@@ -17,7 +17,7 @@ jobs:
       - name: Fetch the mod sdk
         run: wget https://github.com/minecraft-linux/server-modloader/releases/download/v0.0.1-alpha1/mod_sdk.zip && unzip mod_sdk.zip -d mod_sdk
       - name: Build
-        run: mkdir build && cd build && CMAKE_PREFIX_PATH=../mod_sdk cmake .. && make
+        run: mkdir build && cd build && CMAKE_PREFIX_PATH=../mod_sdk cmake .. -DCMAKE_CXX_COMPILER=clang++-12 && make
       - name: Artifact - libCoreMod.so
         uses: actions/upload-artifact@v3
         with:
